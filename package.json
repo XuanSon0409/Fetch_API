@@ -1,0 +1,15 @@
+{
+  "name": "github-user-search",
+  "version": "1.0.0",
+  "description": "GitHub User Search App (SCSS, BEM, Vite)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "sass": "^1.72.0",
+    "vite": "^5.2.0"
+  }
+}
