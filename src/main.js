@@ -1,9 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // --- Constants ---
+  /* Constants */
+  const API_URL = (username) => `https://api.github.com/users/${username}`;
   const body = document.body;
 
-  // --- DOM Elements ---
+  /* DOM Elements */
   const themeToggleButton = document.getElementById('header-button');
+  const searchInput = document.getElementById('search');
+  const searchButton = document.querySelector('.searchBar__button');
+  const errorMessage = document.getElementById('search-err');
 
   const avatar = document.querySelector('.profile-info__avatar');
   const userName = document.getElementById('obj-name');
@@ -19,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const twitterEl = document.getElementById('obj-twitter');
   const companyEl = document.getElementById('obj-company');
 
-  // --- Theme ---
+  /* Theme */
   const updateThemeUI = (theme) => {
     const themeText = theme === 'light' ? 'Dark' : 'Light';
     const themeIcon = theme === 'light' ? 'icon_moon.svg' : 'icon_sun.svg';
@@ -45,7 +49,35 @@ document.addEventListener('DOMContentLoaded', () => {
     updateThemeUI(newTheme);
   });
 
-  // --- Format Date ---
+  /* Fetch User Data */
+  const fetchUser = async (username) => {
+    if (!username.trim()) {
+      showError(true);
+      return;
+    }
+
+    showError(false);
+
+    try {
+      const res = await fetch(API_URL(username));
+      if (!res.ok) {
+        if (res.status === 404) showError(true);
+        return;
+      }
+      const userData = await res.json();
+      updateProfileInfo(userData);
+    } catch (err) {
+      console.error('Fetch error:', err);
+      showError(true);
+    }
+  };
+
+  /* Show Error */
+  const showError = (show) => {
+    errorMessage.style.display = show ? 'block' : 'none';
+  };
+
+  /* Format Date */
   const formatJoinDate = (dateStr) => {
     const date = new Date(dateStr);
     const day = date.getDate();
@@ -54,10 +86,10 @@ document.addEventListener('DOMContentLoaded', () => {
     return `Joined ${day} ${month} ${year}`;
   };
 
-  // --- Update UI with Data ---
-  const updateProfileInfo = (user) => {
+  /* Update UI with Data */
+  const updateProfileInfo = (user) => {   
     avatar.src = user.avatar_url;
-    userName.textContent = user.name ?? user.login;
+    userName.textContent = user.name;
     userLogin.textContent = `@${user.login}`;
     userLogin.href = user.html_url;
     joinDate.textContent = formatJoinDate(user.created_at);
@@ -72,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSocial(companyEl, user.company);
   };
 
-  // --- Update Social Info ---
+  /* Update Social Info */
   const updateSocial = (element, value, isLink = false, href = '') => {
     const listItem = element.closest('li');
     if (value) {
@@ -86,6 +118,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // --- Init ---
+  /* Event listeners */
+  searchButton.addEventListener('click', () => fetchUser(searchInput.value));
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') fetchUser(searchInput.value);
+  });
+
+  /* Init */
   initTheme();
+  fetchUser('octocat');
 });
