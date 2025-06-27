@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* Update UI with Data */
   const updateProfileInfo = (user) => {   
     avatar.src = user.avatar_url;
-    userName.textContent = user.name;
+    userName.textContent = user.name ?? user.login;
     userLogin.textContent = `@${user.login}`;
     userLogin.href = user.html_url;
     joinDate.textContent = formatJoinDate(user.created_at);
