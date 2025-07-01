@@ -10,8 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const errorMessage = document.getElementById('search-err');
 
   const avatar = document.querySelector('.profile-info__avatar');
-  const userName = document.getElementById('obj-name');
-  const userLogin = document.getElementById('obj-username');
+  const userNameE1 = document.getElementById('obj-name');
+  const userLoginE1 = document.getElementById('obj-username');
   const joinDate = document.getElementById('obj-date');
   const bio = document.getElementById('obj-bio');
   const repos = document.querySelector('#grid-data p:nth-child(4)');
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const res = await fetch(API_URL(username));
       if (!res.ok) {
-        if (res.status === 404) showError(true);
+        showError(true);
         return;
       }
       const userData = await res.json();
@@ -87,19 +87,24 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   /* Update UI with Data */
-  const updateProfileInfo = (user) => {   
+  const updateProfileInfo = (user) => {
     avatar.src = user.avatar_url;
-    userName.textContent = user.name ?? user.login;
-    userLogin.textContent = `@${user.login}`;
-    userLogin.href = user.html_url;
+    userNameE1.textContent = user.name ?? user.login;
+    userLoginE1.textContent = `@${user.login}`;
+    userLoginE1.href = user.html_url;
     joinDate.textContent = formatJoinDate(user.created_at);
     bio.textContent = user.bio ?? 'This profile has no bio';
-    repos.textContent = user.public_repos;
-    followers.textContent = user.followers;
-    following.textContent = user.following;
+    repos.textContent = user.public_repos.toLocaleString();
+    followers.textContent = user.followers.toLocaleString();
+    following.textContent = user.following.toLocaleString();
+
+    const normalizeUrl = (url) => {
+      if (!url) return '';
+      return url.startsWith('http') ? url : `https://${url}`;
+    };
 
     updateSocial(locationEl, user.location);
-    updateSocial(websiteEl, user.blog, true);
+    updateSocial(websiteEl, user.blog, true, normalizeUrl(user.blog));
     updateSocial(twitterEl, user.twitter_username, true, `https://twitter.com/${user.twitter_username}`);
     updateSocial(companyEl, user.company);
   };
